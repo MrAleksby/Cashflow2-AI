@@ -58,6 +58,16 @@ name — название или ключ актива
 12. PayDay:
 {"action":"payday"}
 
+13. Удалить расход / ребёнка / расход по займу:
+{"action":"remove_expense","name":"Максим"}
+name — часть названия расхода или имя ребёнка
+
+14. Удалить актив без продажи:
+{"action":"remove_asset","name":"Дуплекс"}
+
+15. Удалить пассив / долг / ипотеку:
+{"action":"remove_liability","name":"Автокредит"}
+
 Если не можешь распознать действие, верни:
 {"action":"unknown","message":"Не понял. Попробуй сформулировать иначе."}
 
@@ -229,6 +239,39 @@ function applyAiAction(cmd) {
 
     case 'payday': {
       doPayDay();
+      break;
+    }
+
+    case 'remove_expense': {
+      const name = (cmd.name || '').toLowerCase();
+      const found = state.expenses.find(e => e.name.toLowerCase().includes(name));
+      if (!found) { showAiError(`Расход «${cmd.name}» не найден`); return; }
+      setState({ expenses: state.expenses.filter(e => e.id !== found.id) });
+      break;
+    }
+
+    case 'remove_asset': {
+      const name = (cmd.name || '').toLowerCase();
+      const found = state.assets.find(a => a.name.toLowerCase().includes(name));
+      if (!found) { showAiError(`Актив «${cmd.name}» не найден`); return; }
+      const liab = found.linkedLiabilityId ? state.liabilities.find(l => l.id === found.linkedLiabilityId) : null;
+      setState({
+        assets: state.assets.filter(a => a.id !== found.id),
+        liabilities: liab ? state.liabilities.filter(l => l.id !== liab.id) : state.liabilities,
+      });
+      break;
+    }
+
+    case 'remove_liability': {
+      const name = (cmd.name || '').toLowerCase();
+      const found = state.liabilities.find(l => l.name.toLowerCase().includes(name));
+      if (!found) { showAiError(`Пассив «${cmd.name}» не найден`); return; }
+      // Удалить связанную комиссию если есть
+      const linkedExpense = state.expenses.find(e => e.linkedLiabilityId === found.id);
+      setState({
+        liabilities: state.liabilities.filter(l => l.id !== found.id),
+        expenses: linkedExpense ? state.expenses.filter(e => e.id !== linkedExpense.id) : state.expenses,
+      });
       break;
     }
 
