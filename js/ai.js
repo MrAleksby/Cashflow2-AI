@@ -27,7 +27,12 @@ incomeSign: 1 = доход, -1 = расход (отрицательный ден
 
 3. Покупка акций:
 {"action":"buy_stocks","key":"ON2U","quantity":100,"price":5}
-Известные акции: MYT4U, ON2U, OK4U, GRO4US, 2BIGPOWER (цена 1200, доход 10/шт), депозит
+Известные акции: MYT4U, ON2U, OK4U, GRO4US, 2BIGPOWER (цена 1200, доход 10/шт)
+
+3a. Депозит (вклад в банк):
+{"action":"buy_deposit","amount":50000}
+Использовать когда: "закинь на депозит", "положить на вклад", "банковский вклад", "депозит"
+Доход 1% в месяц рассчитывается автоматически.
 
 4. Покупка металлов:
 {"action":"buy_metals","key":"krugerrand","quantity":5,"price":1000}
@@ -172,6 +177,25 @@ function applyAiAction(cmd) {
         const entry = { id: nextId(), month: state.monthsCount, description: `🤖 Куплено: ${key} × ${qty}`, amount: -(price * qty), date: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }) };
         setState({ assets: [...state.assets, asset], cash: state.cash - price * qty, history: [...state.history, entry] });
       }
+      break;
+    }
+
+    case 'buy_deposit': {
+      const amount = cmd.amount || 0;
+      if (amount <= 0) { showAiError('Укажи сумму депозита'); break; }
+      const income = Math.round(amount * 0.01);
+      const existing = state.assets.find(a => a.type === 'deposit');
+      let updatedAssets;
+      if (existing) {
+        updatedAssets = state.assets.map(a => a.type === 'deposit'
+          ? { ...a, price: (a.price || 0) + amount, monthlyIncome: (a.monthlyIncome || 0) + income }
+          : a);
+      } else {
+        const asset = { id: nextId(), key: 'deposit', name: 'Депозит', category: 'stocks', type: 'deposit', quantity: 1, price: amount, monthlyIncome: income };
+        updatedAssets = [...state.assets, asset];
+      }
+      const entry = { id: nextId(), month: state.monthsCount, description: `🤖 Депозит: +${amount}`, amount: -amount, date: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }) };
+      setState({ assets: updatedAssets, cash: state.cash - amount, history: [...state.history, entry] });
       break;
     }
 
