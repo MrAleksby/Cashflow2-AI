@@ -1,0 +1,47 @@
+/* Phones ≤ 390px */
+@media (max-width: 390px) {
+  :root {
+    --space-md: 14px;
+    --space-lg: 20px;
+  }
+
+  .header-wallet-amount {
+    font-size: 18px;
+  }
+
+  .nav-item {
+    font-size: 9px;
+  }
+
+  .nav-item svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .options-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .summary-total-value {
+    font-size: 20px;
+  }
+}
+
+/* Very small phones ≤ 320px */
+@media (max-width: 320px) {
+  .options-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tax-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .action-buttons {
+    flex-wrap: wrap;
+  }
+
+  .action-buttons .btn {
+    flex: 1 1 40%;
+  }
+}

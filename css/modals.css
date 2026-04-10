@@ -1,0 +1,475 @@
+/* ── Modal overlay ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 300;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.modal-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* ── Modal sheet (bottom sheet style) ── */
+.modal {
+  background: var(--surface);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  width: 100%;
+  max-width: var(--max-w);
+  max-height: 92dvh;
+  overflow-y: auto;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.modal-overlay.open .modal {
+  transform: translateY(0);
+}
+
+/* Handle bar */
+.modal-handle {
+  width: 36px;
+  height: 4px;
+  background: var(--border);
+  border-radius: var(--radius-full);
+  margin: 12px auto 0;
+}
+
+/* Modal header */
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md) var(--space-md) var(--space-sm);
+}
+
+.modal-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.modal-close {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-full);
+  background: var(--surface-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-2);
+  font-size: 18px;
+  line-height: 1;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.modal-close:active { opacity: 0.6; }
+
+/* Modal body */
+.modal-body {
+  padding: 0 var(--space-md) var(--space-lg);
+}
+
+/* ── Form elements ── */
+.form-group {
+  margin-bottom: var(--space-md);
+}
+
+.form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+
+.form-input {
+  width: 100%;
+  background: var(--surface-2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 13px var(--space-md);
+  font-size: 15px;
+  color: var(--text);
+  transition: border-color var(--transition);
+}
+
+.form-input:focus {
+  border-color: var(--green);
+}
+
+.form-input::placeholder {
+  color: var(--text-3);
+}
+
+/* Select options grid */
+.options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.option-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  border: 1.5px solid var(--border);
+  cursor: pointer;
+  transition: all var(--transition);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.option-btn:active,
+.option-btn.selected {
+  background: var(--green-bg);
+  border-color: var(--green);
+}
+
+.option-btn-icon {
+  font-size: 24px;
+}
+
+.option-btn-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* ── Asset select list (in buy/sell modal) ── */
+.asset-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px var(--space-md);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background var(--transition);
+  -webkit-tap-highlight-color: transparent;
+  background: var(--surface-2);
+  margin-bottom: var(--space-sm);
+}
+
+.asset-option:active {
+  opacity: 0.7;
+}
+
+.asset-option-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.asset-option-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.asset-option-detail {
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.asset-option-price {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Tax rate select ── */
+.tax-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.tax-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  border: 1.5px solid var(--border);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.tax-option:active,
+.tax-option.selected {
+  background: var(--green-bg);
+  border-color: var(--green);
+  color: var(--green);
+}
+
+/* Modal action row */
+.modal-footer {
+  display: flex;
+  gap: var(--space-sm);
+  padding: 0 var(--space-md) var(--space-md);
+}
+
+.modal-footer .btn {
+  flex: 1;
+}
+
+/* ── Sell asset list ── */
+.sell-item {
+  flex-direction: column;
+  align-items: stretch;
+  padding: 12px var(--space-md);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  margin-bottom: var(--space-sm);
+  gap: 0;
+  transition: background var(--transition);
+}
+
+.sell-item--expanded {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.sell-item-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.sell-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.sell-item-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sell-item-detail {
+  font-size: 12px;
+  color: var(--text-3);
+  margin-top: 2px;
+  font-variant-numeric: tabular-nums;
+}
+
+.sell-item-btn {
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  background: var(--red-bg);
+  color: var(--red);
+  cursor: pointer;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sell-item-btn:active { opacity: 0.7; }
+
+/* Раскрытая форма продажи */
+.sell-form {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.sell-form-row {
+  margin-bottom: 10px;
+}
+
+.sell-form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-3);
+  margin-bottom: 4px;
+}
+
+.sell-form-actions {
+  display: flex;
+  gap: var(--space-sm);
+  margin-top: 12px;
+}
+
+.sell-form-actions .btn-secondary,
+.sell-form-actions .btn-primary {
+  flex: 1;
+  padding: 9px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  text-align: center;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sell-form-actions .btn-secondary {
+  background: var(--surface-2);
+  color: var(--text-2);
+  border: 1px solid var(--border);
+}
+
+.sell-form-actions .btn-primary {
+  background: var(--red-bg);
+  color: var(--red);
+  border: none;
+}
+
+.sell-form-actions .btn-primary:active { opacity: 0.75; }
+.sell-form-actions .btn-secondary:active { opacity: 0.75; }
+
+/* ── Mortgage calc (buy form) ── */
+.mortgage-calc {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+
+.mortgage-calc-label {
+  color: var(--text-2);
+  font-weight: 500;
+}
+
+.mortgage-calc-value {
+  font-weight: 700;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.mortgage-calc--active .mortgage-calc-value {
+  color: var(--red);
+}
+
+/* ── Mortgage info (sell form) ── */
+.sell-mortgage-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 13px;
+}
+
+.sell-mortgage-label {
+  color: var(--text-2);
+}
+
+.sell-mortgage-debt {
+  font-weight: 600;
+  color: var(--red);
+  font-variant-numeric: tabular-nums;
+}
+
+.sell-mortgage-row--net {
+  border-top: 1px solid var(--border);
+  margin-top: 4px;
+  padding-top: 8px;
+}
+
+.sell-mortgage-net {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--green);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Back button in modals ── */
+.modal-back {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-2);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: var(--space-sm) var(--space-md);
+  margin-bottom: var(--space-sm);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.modal-back:active { opacity: 0.6; }
+
+/* ── Confirmation views ── */
+.confirm-amount {
+  text-align: center;
+  padding: var(--space-lg) 0;
+}
+
+.confirm-amount-value {
+  font-size: 36px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.confirm-amount-label {
+  font-size: 14px;
+  color: var(--text-2);
+  margin-top: 4px;
+}
+
+/* ── Cashflow toggle (Доход / Расход) ── */
+.cashflow-toggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.cashflow-toggle-btn {
+  flex: 1;
+  padding: 8px 0;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: var(--bg-2);
+  color: var(--text-2);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.cashflow-toggle-btn--active {
+  border-color: var(--green);
+  background: var(--green-bg);
+  color: var(--green);
+}
+
+#btn-income-negative.cashflow-toggle-btn--active {
+  border-color: var(--red);
+  background: var(--red-bg);
+  color: var(--red);
+}
