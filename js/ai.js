@@ -34,6 +34,11 @@ incomeSign: 1 = доход, -1 = расход (отрицательный ден
 Использовать когда: "закинь на депозит", "положить на вклад", "банковский вклад", "депозит"
 Доход 1% в месяц рассчитывается автоматически.
 
+3b. Снятие с депозита (частичное или полное):
+{"action":"withdraw_deposit","amount":20000}
+Использовать когда: "сними с депозита", "снять с вклада", "забрать с депозита"
+Если amount не указан — снять всё.
+
 4. Покупка металлов:
 {"action":"buy_metals","key":"krugerrand","quantity":5,"price":1000}
 Известные металлы: krugerrand, coin_rare
@@ -207,6 +212,21 @@ function applyAiAction(cmd) {
       const asset = { id: nextId(), key, name: catalogAsset?.name || key, category: 'metals', type: 'metals', quantity: qty, price, monthlyIncome: 0 };
       const entry = { id: nextId(), month: state.monthsCount, description: `🤖 Куплено: ${asset.name} × ${qty}`, amount: -(price * qty), date: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }) };
       setState({ assets: [...state.assets, asset], cash: state.cash - price * qty, history: [...state.history, entry] });
+      break;
+    }
+
+    case 'withdraw_deposit': {
+      const dep = state.assets.find(a => a.type === 'deposit');
+      if (!dep) { showAiError('Депозит не найден'); break; }
+      const totalValue = dep.price || 0;
+      const withdrawAmount = cmd.amount ? Math.min(cmd.amount, totalValue) : totalValue;
+      const remaining = totalValue - withdrawAmount;
+      const incomeRatio = remaining > 0 ? remaining / totalValue : 0;
+      const updatedAssets = remaining > 0
+        ? state.assets.map(a => a.type === 'deposit' ? { ...a, price: remaining, monthlyIncome: Math.round((dep.monthlyIncome || 0) * incomeRatio) } : a)
+        : state.assets.filter(a => a.type !== 'deposit');
+      const entry = { id: nextId(), month: state.monthsCount, description: `🤖 Снято с депозита: ${withdrawAmount}`, amount: withdrawAmount, date: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }) };
+      setState({ assets: updatedAssets, cash: state.cash + withdrawAmount, history: [...state.history, entry] });
       break;
     }
 
