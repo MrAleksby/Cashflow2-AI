@@ -94,7 +94,8 @@ async function callClaude(userText) {
   }
 
   const data = await response.json();
-  const text = data.content?.[0]?.text || '';
+  const raw = data.content?.[0]?.text || '';
+  const text = raw.replace(/```(?:json)?\n?/g, '').replace(/```/g, '').trim();
   return JSON.parse(text);
 }
 
