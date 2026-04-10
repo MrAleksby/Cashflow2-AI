@@ -43,9 +43,13 @@ incomeSign: 1 = доход, -1 = расход (отрицательный ден
 {"action":"buy_metals","key":"krugerrand","quantity":5,"price":1000}
 Известные металлы: krugerrand, coin_rare
 
-5. Продажа актива:
-{"action":"sell","name":"ON2U","price":0}
+5. Продажа актива (полная):
+{"action":"sell","name":"Дуплекс","price":60000}
 name — название или ключ актива
+
+5a. Частичная продажа акций:
+{"action":"sell_stocks","key":"ON2U","quantity":50,"price":7}
+Использовать когда продаётся часть акций: "продал 50 акций ON2U по 7"
 
 6. Займ:
 {"action":"loan","name":"Автокредит","amount":20000}
@@ -244,6 +248,23 @@ function applyAiAction(cmd) {
         cash: state.cash + proceeds,
         history: [...state.history, entry],
       });
+      break;
+    }
+
+    case 'sell_stocks': {
+      const key = (cmd.key || cmd.name || '').toUpperCase();
+      const found = state.assets.find(a => (a.key || '').toUpperCase() === key || a.name.toLowerCase().includes(key.toLowerCase()));
+      if (!found) { showAiError(`Акции «${cmd.key || cmd.name}» не найдены`); break; }
+      const qty = Math.min(cmd.quantity || found.quantity, found.quantity);
+      const pricePerShare = cmd.price !== undefined ? cmd.price : found.price;
+      const proceeds = qty * pricePerShare;
+      const remaining = found.quantity - qty;
+      const incomeRatio = remaining > 0 ? remaining / found.quantity : 0;
+      const updatedAssets = remaining > 0
+        ? state.assets.map(a => a.id === found.id ? { ...a, quantity: remaining, monthlyIncome: Math.round((found.monthlyIncome || 0) * incomeRatio) } : a)
+        : state.assets.filter(a => a.id !== found.id);
+      const entry = { id: nextId(), month: state.monthsCount, description: `🤖 Продано: ${found.name} × ${qty} по ${pricePerShare}`, amount: proceeds, date: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }) };
+      setState({ assets: updatedAssets, cash: state.cash + proceeds, history: [...state.history, entry] });
       break;
     }
 
