@@ -85,7 +85,10 @@ name — часть названия расхода или имя ребёнка
 Если не можешь распознать действие, верни:
 {"action":"unknown","message":"Не понял. Попробуй сформулировать иначе."}
 
-Отвечай ТОЛЬКО JSON, без текста вокруг.`;
+Если в сообщении несколько действий — верни массив JSON:
+[{"action":"buy_deposit","amount":5000},{"action":"buy_stocks","key":"ON2U","quantity":100,"price":1}]
+
+Отвечай ТОЛЬКО JSON (объект или массив), без текста вокруг.`;
 
 // ── Вызов Claude API ──────────────────────────────────────────────────────
 
@@ -120,7 +123,9 @@ async function callClaude(userText) {
   const data = await response.json();
   const raw = data.content?.[0]?.text || '';
   const text = raw.replace(/```(?:json)?\n?/g, '').replace(/```/g, '').trim();
-  return JSON.parse(text);
+  const parsed = JSON.parse(text);
+  // Всегда возвращаем массив
+  return Array.isArray(parsed) ? parsed : [parsed];
 }
 
 // ── Применение действия к состоянию ──────────────────────────────────────
@@ -414,8 +419,8 @@ async function sendAiInput() {
 
   showAiLoading(true);
   try {
-    const cmd = await callClaude(text);
-    if (cmd) applyAiAction(cmd);
+    const cmds = await callClaude(text);
+    if (cmds) cmds.forEach(cmd => applyAiAction(cmd));
     if (input) input.value = '';
   } catch (e) {
     showAiError(e.message || 'Ошибка запроса');
